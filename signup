@@ -1,0 +1,620 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>羽球臨打報名</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700;900&family=Bebas+Neue&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --green:#00c853; --green-dark:#009624; --bg:#0a0f0a;
+    --card:#111811; --card2:#162016; --border:#1e2e1e;
+    --text:#e8f5e9; --muted:#6a8f6a; --red:#ff5252;
+    --gold:#ffd740; --blue:#40c4ff;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{background:var(--bg);color:var(--text);font-family:'Noto Sans TC',sans-serif;min-height:100vh;padding-bottom:60px}
+header{background:linear-gradient(135deg,#0a1f0a,#0d2b10);border-bottom:2px solid var(--green);padding:20px 16px 14px;position:relative;overflow:hidden}
+header::before{content:'🏸';position:absolute;right:-10px;top:-10px;font-size:120px;opacity:.07;transform:rotate(-20deg)}
+.header-label{font-family:'Bebas Neue',sans-serif;font-size:11px;letter-spacing:4px;color:var(--green);margin-bottom:4px}
+header h1{font-size:26px;font-weight:900;color:#fff}
+header h1 span{color:var(--green)}
+.session-switcher{display:flex;margin:14px 16px 0;gap:8px}
+.sess-btn{flex:1;padding:12px 0;background:var(--card);border:1.5px solid var(--border);border-radius:12px;color:var(--muted);font-size:14px;font-weight:700;font-family:'Noto Sans TC',sans-serif;cursor:pointer;transition:all .2s;text-align:center}
+.sess-btn.active{background:#0d2b10;border-color:var(--green);color:var(--green)}
+.sess-btn .sess-day{font-size:11px;opacity:.7;display:block;margin-top:2px}
+.session-card{margin:12px 16px;background:var(--card);border:1px solid var(--border);border-radius:16px;overflow:hidden}
+.session-header{background:linear-gradient(135deg,#0d2b10,#122a12);padding:12px 16px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:10px}
+.session-header .badge{background:var(--green);color:#000;font-size:10px;font-weight:700;letter-spacing:2px;padding:3px 8px;border-radius:20px}
+.session-header h2{font-size:15px;font-weight:700}
+.session-body{padding:12px 16px}
+.info-row{display:flex;align-items:center;gap:10px;margin-bottom:9px;font-size:14px}
+.info-row .icon{font-size:17px;min-width:24px;text-align:center}
+.info-row .label{color:var(--muted);font-size:12px;margin-right:2px}
+.spots-section{margin:0 16px 4px}
+.spots-bar-wrap{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:12px 16px}
+.spots-row{display:flex;justify-content:space-between;align-items:center;margin-bottom:9px}
+.spots-label{font-size:13px;color:var(--muted)}
+.spots-count{font-size:22px;font-weight:900;color:var(--green)}
+.spots-count span{font-size:13px;color:var(--muted);font-weight:400}
+.bar-track{height:8px;background:#1a2a1a;border-radius:99px;overflow:hidden}
+.bar-fill{height:100%;background:linear-gradient(90deg,var(--green),#69f0ae);border-radius:99px;transition:width .5s cubic-bezier(.4,0,.2,1)}
+.bar-fill.full{background:linear-gradient(90deg,var(--red),#ff867f)}
+.tabs{display:flex;margin:12px 16px 0;background:var(--card);border:1px solid var(--border);border-radius:12px;overflow:hidden}
+.tab-btn{flex:1;padding:11px 0;font-size:12px;font-weight:700;font-family:'Noto Sans TC',sans-serif;background:transparent;border:none;color:var(--muted);cursor:pointer;transition:all .2s}
+.tab-btn.active{color:#000;background:var(--green);border-radius:10px}
+.form-section{margin:12px 16px 0;background:var(--card);border:1px solid var(--border);border-radius:16px;padding:16px}
+.form-section h3{font-size:14px;font-weight:700;margin-bottom:14px}
+.field-label{font-size:12px;color:var(--muted);margin-bottom:6px}
+.input-wrap{margin-bottom:14px}
+.input-wrap input{width:100%;background:#0d180d;border:1.5px solid var(--border);border-radius:10px;padding:13px 14px;font-size:15px;font-family:'Noto Sans TC',sans-serif;color:var(--text);outline:none;transition:border-color .2s}
+.input-wrap input:focus{border-color:var(--green)}
+.input-wrap input::placeholder{color:var(--muted)}
+.count-row{display:flex;align-items:center;gap:12px;margin-bottom:14px;background:#0d180d;border:1.5px solid var(--border);border-radius:10px;padding:10px 14px}
+.count-row label{font-size:14px;color:var(--muted);flex:1}
+.count-stepper{display:flex;align-items:center;gap:10px}
+.stepper-btn{width:34px;height:34px;background:var(--card2);border:1.5px solid var(--border);border-radius:8px;color:var(--green);font-size:20px;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .15s;line-height:1;font-family:monospace}
+.stepper-btn:active{background:#0d2b10;border-color:var(--green)}
+.stepper-btn.red{border-color:#3a1010;color:var(--red)}
+.stepper-btn.red:active{background:#2b0d0d}
+.stepper-val{font-size:20px;font-weight:900;color:var(--text);min-width:28px;text-align:center}
+.stepper-val.red{color:var(--red)}
+.toggle-row{display:flex;align-items:center;justify-content:space-between;background:#0d180d;border:1.5px solid var(--border);border-radius:10px;padding:12px 14px;margin-bottom:14px;cursor:pointer;transition:border-color .2s}
+.toggle-label{font-size:14px}
+.toggle-label small{display:block;font-size:11px;color:var(--muted);margin-top:2px}
+.toggle-switch{width:44px;height:26px;background:#1e2e1e;border-radius:99px;position:relative;transition:background .2s;flex-shrink:0}
+.toggle-switch.on{background:var(--green)}
+.toggle-switch::after{content:'';position:absolute;width:20px;height:20px;background:#fff;border-radius:50%;top:3px;left:3px;transition:transform .2s}
+.toggle-switch.on::after{transform:translateX(18px)}
+.btn-signup{width:100%;background:var(--green);color:#000;font-size:15px;font-weight:700;font-family:'Noto Sans TC',sans-serif;border:none;border-radius:10px;padding:14px;cursor:pointer;transition:all .18s;letter-spacing:1px}
+.btn-signup:active{transform:scale(.97);background:var(--green-dark)}
+.btn-signup:disabled{background:#1e2e1e;color:var(--muted);cursor:not-allowed}
+.msg{font-size:13px;margin-top:10px;padding:8px 12px;border-radius:8px;text-align:center}
+.msg.success{background:#0d2b10;color:var(--green);border:1px solid var(--green-dark)}
+.msg.error{background:#2b0d0d;color:var(--red);border:1px solid #7f2020}
+.self-delete-section{margin:12px 16px 0;background:var(--card);border:1px solid var(--border);border-radius:16px;padding:16px}
+.self-delete-section h3{font-size:14px;font-weight:700;margin-bottom:6px}
+.self-delete-section p{font-size:12px;color:var(--muted);margin-bottom:14px}
+.btn-cancel{width:100%;background:transparent;border:1.5px solid #3a1010;color:var(--red);font-size:14px;font-weight:700;font-family:'Noto Sans TC',sans-serif;border-radius:10px;padding:13px;cursor:pointer;transition:all .15s}
+.btn-cancel:active{background:#2b0d0d}
+.list-section{margin:12px 16px 0}
+.list-title{font-size:12px;font-weight:700;letter-spacing:2px;color:var(--muted);margin-bottom:10px;padding-left:2px}
+.player-item{display:flex;align-items:center;background:var(--card);border:1px solid var(--border);border-radius:12px;padding:11px 14px;margin-bottom:8px;animation:slideIn .25s ease;gap:6px;flex-wrap:wrap}
+.player-item.waitlist{border-style:dashed;opacity:.75}
+@keyframes slideIn{from{opacity:0;transform:translateY(-8px)}to{opacity:1;transform:translateY(0)}}
+.player-num{font-family:'Bebas Neue',sans-serif;font-size:20px;color:var(--green);min-width:28px}
+.player-item.waitlist .player-num{color:var(--gold)}
+.player-name{font-size:15px;font-weight:500;flex:1}
+.tags{display:flex;gap:5px;align-items:center;flex-wrap:wrap}
+.tag{font-size:10px;border-radius:6px;padding:2px 7px;white-space:nowrap}
+.tag.waitlist-tag{background:#2b2500;color:var(--gold);border:1px solid #5a4a00}
+.tag.beginner-tag{background:#001f3a;color:var(--blue);border:1px solid #003d6b}
+.tag.count-tag{background:#1a1a2e;color:#9c9cff;border:1px solid #3a3a6e}
+.btn-delete{background:transparent;border:1.5px solid #3a1010;color:var(--red);border-radius:8px;padding:4px 10px;font-size:12px;font-family:'Noto Sans TC',sans-serif;cursor:pointer;transition:all .15s;margin-left:auto}
+.btn-delete:active{background:#2b0d0d}
+.empty-state{text-align:center;color:var(--muted);font-size:13px;padding:30px 0}
+.empty-state .e-icon{font-size:36px;margin-bottom:8px}
+.admin-section{margin:12px 16px 0;background:var(--card);border:1px solid var(--border);border-radius:16px;padding:16px}
+.admin-section h3{font-size:14px;font-weight:700;margin-bottom:14px}
+.admin-logged{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px}
+.admin-badge{font-size:12px;background:#0d2b10;color:var(--green);border:1px solid var(--green-dark);border-radius:20px;padding:3px 10px}
+.btn-logout{background:transparent;border:1px solid var(--border);color:var(--muted);font-size:12px;font-family:'Noto Sans TC',sans-serif;border-radius:8px;padding:5px 10px;cursor:pointer}
+.editor-label{font-size:12px;color:var(--muted);margin-bottom:5px}
+.editor-input{width:100%;background:#0d180d;border:1.5px solid var(--border);border-radius:10px;padding:11px 13px;font-size:14px;font-family:'Noto Sans TC',sans-serif;color:var(--text);outline:none;margin-bottom:10px;transition:border-color .2s}
+.editor-input:focus{border-color:var(--green)}
+.btn-save{background:var(--card2);border:1px solid var(--green-dark);color:var(--green);font-size:13px;font-weight:700;font-family:'Noto Sans TC',sans-serif;border-radius:10px;padding:10px 16px;cursor:pointer;width:100%;transition:all .15s}
+.btn-save:active{background:#0d2b10}
+.divider{height:1px;background:var(--border);margin:16px 0}
+.overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:100;align-items:flex-end;justify-content:center}
+.overlay.show{display:flex}
+.dialog{background:#161e16;border:1px solid var(--border);border-radius:20px 20px 0 0;padding:24px 20px 36px;width:100%;max-width:480px}
+.dialog h4{font-size:16px;font-weight:700;margin-bottom:8px}
+.dialog p{font-size:13px;color:var(--muted);margin-bottom:20px}
+.dialog-btns{display:flex;gap:10px}
+.dialog-btns button{flex:1;padding:13px;border-radius:10px;font-size:14px;font-weight:700;font-family:'Noto Sans TC',sans-serif;cursor:pointer;border:none}
+.btn-confirm-cancel{background:#2b0d0d;color:var(--red);border:1.5px solid #3a1010!important}
+.btn-confirm-ok{background:var(--red);color:#fff}
+.admin-sess-tabs{display:flex;gap:8px;margin-bottom:14px}
+.admin-sess-tab{flex:1;padding:9px 0;background:#0d180d;border:1.5px solid var(--border);border-radius:10px;color:var(--muted);font-size:13px;font-weight:700;font-family:'Noto Sans TC',sans-serif;cursor:pointer;text-align:center;transition:all .2s}
+.admin-sess-tab.active{background:#0d2b10;border-color:var(--green);color:var(--green)}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="header-label">BADMINTON DROP-IN</div>
+  <h1>羽球<span>臨打</span>報名系統</h1>
+</header>
+
+<div class="session-switcher">
+  <button class="sess-btn active" id="sess-btn-0" onclick="switchSession(0)">
+    🗓 週六場
+    <span class="sess-day" id="sess-day-0"></span>
+  </button>
+  <button class="sess-btn" id="sess-btn-1" onclick="switchSession(1)">
+    🗓 週日場
+    <span class="sess-day" id="sess-day-1"></span>
+  </button>
+  <button class="sess-btn" id="sess-btn-2" onclick="switchSession(2)">
+    🗓 週一場
+    <span class="sess-day" id="sess-day-2"></span>
+  </button>
+</div>
+
+<div class="session-card">
+  <div class="session-header">
+    <span class="badge">場次資訊</span>
+    <h2 id="session-title">週六臨打</h2>
+  </div>
+  <div class="session-body">
+    <div class="info-row"><span class="icon">📅</span><span class="label">日期</span><span id="display-date"></span></div>
+    <div class="info-row"><span class="icon">🕐</span><span class="label">時間</span><span id="display-time"></span></div>
+    <div class="info-row"><span class="icon">📍</span><span class="label">地點</span><span id="display-venue"></span></div>
+    <div class="info-row"><span class="icon">💰</span><span class="label">費用</span><span id="display-fee"></span></div>
+  </div>
+</div>
+
+<div class="spots-section">
+  <div class="spots-bar-wrap">
+    <div class="spots-row">
+      <span class="spots-label">剩餘名額</span>
+      <span class="spots-count" id="spots-left">--<span id="spots-max-label"></span></span>
+    </div>
+    <div class="bar-track"><div class="bar-fill" id="bar-fill" style="width:0%"></div></div>
+  </div>
+</div>
+
+<div class="tabs">
+  <button class="tab-btn active" onclick="switchTab('signup')">✍️ 報名</button>
+  <button class="tab-btn" onclick="switchTab('list')">👥 名單</button>
+  <button class="tab-btn" onclick="switchTab('cancel')">❌ 取消</button>
+  <button class="tab-btn" onclick="switchTab('admin')">🔐 管理</button>
+</div>
+
+<div id="tab-signup">
+  <div class="form-section">
+    <h3>填寫報名資料</h3>
+    <div class="field-label">姓名（代表人）</div>
+    <div class="input-wrap">
+      <input type="text" id="name-input" placeholder="請輸入你的姓名" maxlength="20" autocomplete="off">
+    </div>
+    <div class="field-label">生日（月日4碼，用於取消驗證）</div>
+    <div class="input-wrap">
+      <input type="text" id="birthday-input" placeholder="例：0614" maxlength="4" autocomplete="off" inputmode="numeric">
+    </div>
+    <div class="field-label">報名人數</div>
+    <div class="count-row">
+      <label>共幾位？</label>
+      <div class="count-stepper">
+        <button class="stepper-btn" onclick="changeCount(-1)">−</button>
+        <span class="stepper-val" id="count-display">1</span>
+        <button class="stepper-btn" onclick="changeCount(1)">+</button>
+      </div>
+    </div>
+    <div class="toggle-row" onclick="toggleBeginner()">
+      <div class="toggle-label">🐣 我是新手<small>讓其他球友知道你是初學者</small></div>
+      <div class="toggle-switch" id="beginner-toggle"></div>
+    </div>
+    <button class="btn-signup" id="signup-btn" onclick="doSignup()">確認報名 🏸</button>
+    <div id="signup-msg"></div>
+  </div>
+</div>
+
+<div id="tab-list" style="display:none">
+  <div class="list-section">
+    <div class="list-title">正式名單</div>
+    <div id="main-list"></div>
+    <div class="list-title" id="waitlist-title" style="display:none;margin-top:16px">候補名單</div>
+    <div id="wait-list"></div>
+  </div>
+</div>
+
+<div id="tab-cancel" style="display:none">
+  <div class="self-delete-section">
+    <h3>❌ 取消報名</h3>
+    <p>輸入姓名與生日驗證後，可選擇要取消幾人。</p>
+    <div class="input-wrap">
+      <input type="text" id="cancel-name" placeholder="報名時的姓名" maxlength="20" autocomplete="off">
+    </div>
+    <div class="input-wrap">
+      <input type="text" id="cancel-birthday" placeholder="生日月日4碼，例：0614" maxlength="4" autocomplete="off" inputmode="numeric">
+    </div>
+    <div class="field-label">要取消幾人？</div>
+    <div class="count-row" style="margin-bottom:14px">
+      <label style="color:var(--text);font-size:14px">取消 <b id="cancel-count-display" style="color:var(--red)">1</b> 人</label>
+      <div class="count-stepper">
+        <button class="stepper-btn red" onclick="changeCancelCount(-1)">−</button>
+        <span class="stepper-val red" id="cancel-count-num">1</span>
+        <button class="stepper-btn red" onclick="changeCancelCount(1)">+</button>
+      </div>
+    </div>
+    <button class="btn-cancel" onclick="doSelfDelete()">確認取消報名</button>
+    <div id="cancel-msg"></div>
+  </div>
+</div>
+
+<div id="tab-admin" style="display:none">
+  <div class="admin-section">
+    <h3>🔐 管理員登入</h3>
+    <div id="admin-login-area">
+      <div class="input-wrap">
+        <input type="password" id="admin-pw" placeholder="請輸入管理員密碼" autocomplete="off">
+      </div>
+      <button class="btn-signup" onclick="adminLogin()">登入</button>
+      <div id="admin-msg"></div>
+    </div>
+    <div id="admin-panel" style="display:none">
+      <div class="admin-logged">
+        <span class="admin-badge">✅ 管理員模式</span>
+        <button class="btn-logout" onclick="adminLogout()">登出</button>
+      </div>
+      <div class="divider"></div>
+      <div class="editor-label" style="margin-bottom:8px">編輯場次</div>
+      <div class="admin-sess-tabs">
+        <button class="admin-sess-tab active" id="admin-sess-tab-0" onclick="adminSwitchSess(0)">週六場</button>
+        <button class="admin-sess-tab" id="admin-sess-tab-1" onclick="adminSwitchSess(1)">週日場</button>
+        <button class="admin-sess-tab" id="admin-sess-tab-2" onclick="adminSwitchSess(2)">週一場</button>
+      </div>
+      <div class="editor-label">場次標題</div><input class="editor-input" id="ed-title" placeholder="例：週六臨打">
+      <div class="editor-label">日期</div><input class="editor-input" id="ed-date" placeholder="例：2025/06/14（六）">
+      <div class="editor-label">時間</div><input class="editor-input" id="ed-time" placeholder="例：19:00 – 22:00">
+      <div class="editor-label">地點</div><input class="editor-input" id="ed-venue" placeholder="例：台北市立體育館">
+      <div class="editor-label">費用</div><input class="editor-input" id="ed-fee" placeholder="例：每人 $150">
+      <div class="editor-label">人數上限</div><input class="editor-input" id="ed-max" type="number" placeholder="例：16" min="1" max="200">
+      <button class="btn-save" onclick="saveSession()">💾 儲存場次資訊</button>
+      <div class="divider"></div>
+      <div class="list-title">完整名單</div>
+      <div id="admin-list"></div>
+      <div class="divider"></div>
+      <button class="btn-cancel" style="width:100%" onclick="showClearDialog()">🗑️ 清空此場次名單</button>
+    </div>
+  </div>
+</div>
+
+<div class="overlay" id="clear-overlay">
+  <div class="dialog">
+    <h4>⚠️ 確認清空名單？</h4>
+    <p id="clear-dialog-msg">此操作無法復原，確定要清空全部報名名單嗎？</p>
+    <div class="dialog-btns">
+      <button class="btn-confirm-cancel" onclick="hideClearDialog()">取消</button>
+      <button class="btn-confirm-ok" onclick="confirmClear()">確認清空</button>
+    </div>
+  </div>
+</div>
+
+<script>
+const JSONBIN_ID  = '69c826e86860e0745bfccb0b';
+const JSONBIN_KEY = '$2a$10$WXnLWQ86HtySjI8DcTva0.mKLc1bh3AS2P1f1ngRKfdy..u9oviT.';
+const JSONBIN_URL = `https://api.jsonbin.io/v3/b/${JSONBIN_ID}`;
+
+const ADMIN_PW = 'badminton2025';
+
+let currentSession = 0;
+let adminEditSession = 0;
+let selectedCount = 1;
+let cancelCount = 1;
+let isBeginner = false;
+let isAdmin = false;
+let state = { sessions: [] };
+
+function defaultSessions() {
+  const sat = nextWeekday(6);
+  const sun = nextWeekday(0);
+  const mon = nextWeekday(1);
+  return [
+    { title:'週六臨打', date:sat, time:'19:00 – 22:00', venue:'台北市立體育館 B1 羽球場', fee:'每人 $150', max:16, players:[] },
+    { title:'週日臨打', date:sun, time:'09:00 – 12:00', venue:'台北市立體育館 B1 羽球場', fee:'每人 $150', max:16, players:[] },
+    { title:'週一臨打', date:mon, time:'19:00 – 22:00', venue:'台北市立體育館 B1 羽球場', fee:'每人 $150', max:16, players:[] }
+  ];
+}
+
+function nextWeekday(dow) {
+  const d = new Date();
+  const diff = (dow - d.getDay() + 7) % 7 || 7;
+  d.setDate(d.getDate() + diff);
+  const days = ['日','一','二','三','四','五','六'];
+  return `${d.getFullYear()}/${String(d.getMonth()+1).padStart(2,'0')}/${String(d.getDate()).padStart(2,'0')}（${days[d.getDay()]}）`;
+}
+
+async function saveData() {
+  try {
+    await fetch(JSONBIN_URL, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json', 'X-Master-Key': JSONBIN_KEY },
+      body: JSON.stringify(state)
+    });
+  } catch(e) { console.error('儲存失敗', e); }
+}
+
+async function loadData() {
+  try {
+    const res = await fetch(`${JSONBIN_URL}/latest`, {
+      headers: { 'X-Master-Key': JSONBIN_KEY }
+    });
+    const json = await res.json();
+    const data = json.record;
+    if (data && data.sessions && data.sessions.length > 0) {
+      state = data;
+      if (state.sessions.length < 3) {
+        state.sessions.push({ title:'週一臨打', date:nextWeekday(1), time:'19:00 – 22:00', venue:'台北市立體育館 B1 羽球場', fee:'每人 $150', max:16, players:[] });
+        await saveData();
+      }
+    } else {
+      state = { sessions: defaultSessions() };
+      await saveData();
+    }
+  } catch(e) {
+    console.error('載入失敗', e);
+    state = { sessions: defaultSessions() };
+  }
+}
+
+function startAutoRefresh() {
+  setInterval(async () => {
+    const prev = JSON.stringify(state);
+    await loadData();
+    if (JSON.stringify(state) !== prev) render();
+  }, 5000);
+}
+
+function sess(idx) { return state.sessions[idx !== undefined ? idx : currentSession]; }
+
+function init() {
+  state.sessions.forEach((s, i) => {
+    const el = document.getElementById(`sess-day-${i}`);
+    if (el) el.textContent = s.date ? s.date.slice(5, 10) : '';
+  });
+  render();
+}
+
+function switchSession(idx) {
+  currentSession = idx;
+  [0,1,2].forEach(i => {
+    document.getElementById(`sess-btn-${i}`).classList.toggle('active', i===idx);
+  });
+  selectedCount = 1; isBeginner = false;
+  document.getElementById('count-display').textContent = '1';
+  document.getElementById('beginner-toggle').classList.remove('on');
+  document.getElementById('name-input').value = '';
+  document.getElementById('birthday-input').value = '';
+  render();
+}
+
+function adminSwitchSess(idx) {
+  adminEditSession = idx;
+  [0,1,2].forEach(i => document.getElementById(`admin-sess-tab-${i}`).classList.toggle('active', i===idx));
+  syncAdminEditor();
+  renderAdminList();
+}
+
+function render() {
+  const s = sess();
+  document.getElementById('session-title').textContent = s.title;
+  document.getElementById('display-date').textContent = s.date;
+  document.getElementById('display-time').textContent = s.time;
+  document.getElementById('display-venue').textContent = s.venue;
+  document.getElementById('display-fee').textContent = s.fee;
+  document.getElementById('spots-max-label').textContent = ` / ${s.max}`;
+
+  const main = s.players.filter(p => !p.waitlist);
+  const wait = s.players.filter(p => p.waitlist);
+  const mainCount = main.reduce((a,p) => a+(p.count||1), 0);
+  const left = Math.max(0, s.max - mainCount);
+
+  document.getElementById('spots-left').childNodes[0].textContent = left;
+  const pct = Math.min((mainCount/s.max)*100, 100);
+  const bar = document.getElementById('bar-fill');
+  bar.style.width = pct+'%';
+  bar.classList.toggle('full', left===0);
+
+  renderList('main-list', main, false);
+  const wt = document.getElementById('waitlist-title');
+  if (wait.length > 0) { wt.style.display=''; renderList('wait-list', wait, true); }
+  else { wt.style.display='none'; document.getElementById('wait-list').innerHTML=''; }
+
+  document.getElementById('signup-btn').textContent = left > 0 ? '確認報名 🏸' : '加入候補名單 ⏳';
+
+  state.sessions.forEach((s2, i) => {
+    const el = document.getElementById(`sess-day-${i}`);
+    if (el) el.textContent = s2.date ? s2.date.slice(5, 10) : '';
+  });
+
+  if (isAdmin) { syncAdminEditor(); renderAdminList(); }
+}
+
+function renderList(elId, list, isWait) {
+  const el = document.getElementById(elId);
+  if (!isWait && list.length===0) { el.innerHTML=`<div class="empty-state"><div class="e-icon">🏸</div>尚無人報名，快來搶位！</div>`; return; }
+  el.innerHTML = list.map((p,i) => playerHTML(p, i+1, isWait, false)).join('');
+}
+
+function playerHTML(p, num, isWait, showDel) {
+  const ct = (p.count&&p.count>1) ? `<span class="tag count-tag">×${p.count}</span>` : '';
+  const bt = p.beginner ? `<span class="tag beginner-tag">🐣 新手</span>` : '';
+  const wt = isWait ? `<span class="tag waitlist-tag">候補 #${num}</span>` : '';
+  const db = showDel ? `<button class="btn-delete" onclick="deletePlayer('${p.id}')">刪除</button>` : '';
+  return `<div class="player-item ${isWait?'waitlist':''}">
+    <span class="player-num">${isWait?'·':num}</span>
+    <span class="player-name">${esc(p.name)}</span>
+    <span class="tags">${ct}${bt}${wt}</span>${db}
+  </div>`;
+}
+
+function esc(s) { return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+
+function syncAdminEditor() {
+  const s = sess(adminEditSession);
+  document.getElementById('ed-title').value = s.title;
+  document.getElementById('ed-date').value = s.date;
+  document.getElementById('ed-time').value = s.time;
+  document.getElementById('ed-venue').value = s.venue;
+  document.getElementById('ed-fee').value = s.fee;
+  document.getElementById('ed-max').value = s.max;
+}
+
+function renderAdminList() {
+  const s = sess(adminEditSession);
+  const al = document.getElementById('admin-list');
+  if (s.players.length===0) { al.innerHTML=`<div class="empty-state"><div class="e-icon">🏸</div>名單是空的</div>`; return; }
+  let seq=0;
+  al.innerHTML = s.players.map(p => {
+    if (!p.waitlist) seq++;
+    return playerHTML(p, p.waitlist?'候補':seq, p.waitlist, true);
+  }).join('');
+}
+
+function changeCount(d) {
+  selectedCount = Math.max(1, selectedCount+d);
+  document.getElementById('count-display').textContent = selectedCount;
+}
+function changeCancelCount(d) {
+  cancelCount = Math.max(1, cancelCount+d);
+  document.getElementById('cancel-count-num').textContent = cancelCount;
+  document.getElementById('cancel-count-display').textContent = cancelCount;
+}
+function toggleBeginner() {
+  isBeginner = !isBeginner;
+  document.getElementById('beginner-toggle').classList.toggle('on', isBeginner);
+}
+
+async function doSignup() {
+  const name = document.getElementById('name-input').value.trim();
+  const birthday = document.getElementById('birthday-input').value.trim();
+  const msgEl = document.getElementById('signup-msg');
+  if (!name||name.length<2) { showMsg(msgEl,'請填寫至少2個字的姓名','error'); return; }
+  if (!/^\d{4}$/.test(birthday)) { showMsg(msgEl,'請填寫4碼生日月日，例：0614','error'); return; }
+  const s = sess();
+  if (s.players.find(p=>p.name===name)) { showMsg(msgEl,`「${name}」已在此場次名單中囉！`,'error'); return; }
+  const mainCount = s.players.filter(p=>!p.waitlist).reduce((a,p)=>a+(p.count||1),0);
+  const isWait = mainCount+selectedCount > s.max;
+  s.players.push({ id:Date.now().toString(), name, birthday, count:selectedCount, beginner:isBeginner, waitlist:isWait });
+  await saveData(); render();
+  document.getElementById('name-input').value='';
+  document.getElementById('birthday-input').value='';
+  isBeginner=false; selectedCount=1;
+  document.getElementById('count-display').textContent='1';
+  document.getElementById('beginner-toggle').classList.remove('on');
+  showMsg(msgEl, isWait?`✅ 已加入候補名單！`:`✅ 報名成功！歡迎 ${name}！`,'success');
+}
+
+async function doSelfDelete() {
+  const name = document.getElementById('cancel-name').value.trim();
+  const birthday = document.getElementById('cancel-birthday').value.trim();
+  const msgEl = document.getElementById('cancel-msg');
+  if (!name) { showMsg(msgEl,'請輸入姓名','error'); return; }
+  if (!birthday) { showMsg(msgEl,'請輸入生日月日4碼','error'); return; }
+  const s = sess();
+  const idx = s.players.findIndex(p=>p.name===name);
+  if (idx===-1) { showMsg(msgEl,`找不到「${name}」的報名紀錄`,'error'); return; }
+  if (s.players[idx].birthday!==birthday) { showMsg(msgEl,'生日驗證錯誤，請確認後再試','error'); return; }
+  const player = s.players[idx];
+  const orig = player.count||1;
+  if (cancelCount>orig) { showMsg(msgEl,`你只報名了 ${orig} 人，無法取消 ${cancelCount} 人`,'error'); return; }
+  const wasMain = !player.waitlist;
+  if (cancelCount===orig) s.players.splice(idx,1);
+  else player.count = orig - cancelCount;
+  if (wasMain) promoteWaitlist(s);
+  await saveData(); render();
+  document.getElementById('cancel-name').value='';
+  document.getElementById('cancel-birthday').value='';
+  const kept = orig - cancelCount;
+  cancelCount=1;
+  document.getElementById('cancel-count-num').textContent='1';
+  document.getElementById('cancel-count-display').textContent='1';
+  showMsg(msgEl, kept>0 ? `✅ 已取消部分人數，「${name}」剩餘 ${kept} 人` : `✅ 已取消「${name}」的報名`,'success');
+}
+
+function promoteWaitlist(s) {
+  for (let p of s.players) {
+    if (!p.waitlist) continue;
+    const mc = s.players.filter(x=>!x.waitlist).reduce((a,x)=>a+(x.count||1),0);
+    if (mc+(p.count||1)<=s.max) p.waitlist=false;
+  }
+}
+
+function adminLogin() {
+  const pw = document.getElementById('admin-pw').value;
+  if (pw===ADMIN_PW) {
+    isAdmin=true;
+    adminEditSession=currentSession;
+    document.getElementById('admin-login-area').style.display='none';
+    document.getElementById('admin-panel').style.display='';
+    [0,1,2].forEach(i=>document.getElementById(`admin-sess-tab-${i}`).classList.toggle('active',i===adminEditSession));
+    render();
+  } else showMsg(document.getElementById('admin-msg'),'密碼錯誤','error');
+}
+
+function adminLogout() {
+  isAdmin=false;
+  document.getElementById('admin-login-area').style.display='';
+  document.getElementById('admin-panel').style.display='none';
+  document.getElementById('admin-pw').value='';
+}
+
+async function deletePlayer(id) {
+  const s = sess(adminEditSession);
+  const idx = s.players.findIndex(p=>p.id===id);
+  if (idx===-1) return;
+  const wasMain = !s.players[idx].waitlist;
+  s.players.splice(idx,1);
+  if (wasMain) promoteWaitlist(s);
+  await saveData(); render();
+}
+
+async function saveSession() {
+  const s = sess(adminEditSession);
+  s.title = document.getElementById('ed-title').value.trim()||s.title;
+  s.date = document.getElementById('ed-date').value.trim()||s.date;
+  s.time = document.getElementById('ed-time').value.trim()||s.time;
+  s.venue = document.getElementById('ed-venue').value.trim()||s.venue;
+  s.fee = document.getElementById('ed-fee').value.trim()||s.fee;
+  const mx = parseInt(document.getElementById('ed-max').value);
+  if (mx>0) s.max=mx;
+  let cum=0;
+  for (let p of s.players) { const c=p.count||1; if(cum+c<=s.max){p.waitlist=false;cum+=c;}else p.waitlist=true; }
+  await saveData(); render();
+  showMsg(document.getElementById('admin-msg'),'✅ 場次資訊已儲存！','success');
+}
+
+function showClearDialog() {
+  const s = sess(adminEditSession);
+  document.getElementById('clear-dialog-msg').textContent = `確定要清空「${s.title}」的全部報名名單嗎？此操作無法復原。`;
+  document.getElementById('clear-overlay').classList.add('show');
+}
+function hideClearDialog() {
+  document.getElementById('clear-overlay').classList.remove('show');
+}
+async function confirmClear() {
+  sess(adminEditSession).players = [];
+  await saveData(); render();
+  hideClearDialog();
+}
+
+function showMsg(el, text, type) {
+  el.className=`msg ${type}`; el.textContent=text;
+  setTimeout(()=>{el.textContent='';el.className='msg';},3500);
+}
+
+function switchTab(tab) {
+  ['signup','list','cancel','admin'].forEach(t => {
+    document.getElementById(`tab-${t}`).style.display = t===tab?'':'none';
+  });
+  document.querySelectorAll('.tab-btn').forEach((b,i) => {
+    b.classList.toggle('active',['signup','list','cancel','admin'][i]===tab);
+  });
+  if (tab==='list'||tab==='admin') render();
+}
+
+(async () => {
+  await loadData();
+  init();
+  startAutoRefresh();
+  document.getElementById('name-input').addEventListener('keydown',e=>{if(e.key==='Enter')doSignup()});
+  document.getElementById('cancel-name').addEventListener('keydown',e=>{if(e.key==='Enter')doSelfDelete()});
+  document.getElementById('cancel-birthday').addEventListener('keydown',e=>{if(e.key==='Enter')doSelfDelete()});
+  document.getElementById('admin-pw').addEventListener('keydown',e=>{if(e.key==='Enter')adminLogin()});
+  document.getElementById('clear-overlay').addEventListener('click',e=>{if(e.target===e.currentTarget)hideClearDialog()});
+})();
+</script>
+</body>
+</html>
