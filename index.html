@@ -497,12 +497,13 @@ function renderAdminList() {
 }
 
 // ── 新增／刪除場次 ────────────────────────────────────
-async function addSession() {
+function addSession() {
   const title = prompt('新場次名稱（例：週三臨打）');
   if (!title) return;
   state.sessions.push({ title, date:nextWeekday(3), time:'19:00 – 22:00', venue:'台北市立體育館 B1 羽球場', fee:'每人 $150', max:16, players:[] });
   adminEditSession = state.sessions.length - 1;
-  await saveData(); render();
+  render();
+  saveData();
 }
 
 function deleteSession() {
@@ -512,18 +513,20 @@ function deleteSession() {
   document.getElementById('del-sess-overlay').classList.add('show');
 }
 function hideDelSessDialog() { document.getElementById('del-sess-overlay').classList.remove('show'); }
-async function confirmDeleteSession() {
+function confirmDeleteSession() {
   state.sessions.splice(adminEditSession, 1);
   adminEditSession = Math.max(0, adminEditSession - 1);
   if (currentSession >= state.sessions.length) currentSession = 0;
-  await saveData(); render();
   hideDelSessDialog();
+  render();
+  saveData();
 }
 
 // ── 公告儲存 ──────────────────────────────────────────
-async function saveNotice() {
+function saveNotice() {
   state.notice = document.getElementById('ed-notice').value.trim();
-  await saveData(); render();
+  render();
+  saveData();
   showMsg(document.getElementById('admin-msg2'), '✅ 公告已更新！', 'success');
 }
 
