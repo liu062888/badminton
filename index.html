@@ -265,7 +265,7 @@
       <!-- 場次資訊編輯 -->
       <div class="divider"></div>
       <div class="editor-label">場次標題</div><input class="editor-input" id="ed-title" placeholder="例：週六臨打">
-      <div class="editor-label">日期</div><input class="editor-input" id="ed-date" placeholder="例：2025/06/14（六）">
+      <div class="editor-label">日期</div><input class="editor-input" id="ed-date" type="date">
       <div class="editor-label">時間</div><input class="editor-input" id="ed-time" placeholder="例：19:00 – 22:00">
       <div class="editor-label">地點</div><input class="editor-input" id="ed-venue" placeholder="例：台北市立體育館">
       <div class="editor-label">費用</div><input class="editor-input" id="ed-fee" placeholder="例：每人 $150">
@@ -325,6 +325,21 @@ function defaultSessions() {
     { title:'週日臨打', date:nextWeekday(0), time:'09:00 – 12:00', venue:'台北市立體育館 B1 羽球場', fee:'每人 $150', max:16, players:[] },
     { title:'週一臨打', date:nextWeekday(1), time:'19:00 – 22:00', venue:'台北市立體育館 B1 羽球場', fee:'每人 $150', max:16, players:[] }
   ];
+}
+
+// 把 "2026/04/05（日）" 轉成 "2026-04-05" 供 date input 使用
+function dateToInput(str) {
+  if (!str) return '';
+  const m = str.match(/(\d{4})\/(\d{2})\/(\d{2})/);
+  return m ? `${m[1]}-${m[2]}-${m[3]}` : '';
+}
+
+// 把 "2026-04-05" 轉成 "2026/04/05（日）"
+function inputToDate(val) {
+  if (!val) return '';
+  const d = new Date(val + 'T00:00:00');
+  const days = ['日','一','二','三','四','五','六'];
+  return `${val.slice(0,4)}/${val.slice(5,7)}/${val.slice(8,10)}（${days[d.getDay()]}）`;
 }
 
 function nextWeekday(dow) {
@@ -476,7 +491,7 @@ function syncAdminEditor() {
   if (!sess(adminEditSession)) return;
   const s = sess(adminEditSession);
   document.getElementById('ed-title').value = s.title;
-  document.getElementById('ed-date').value = s.date;
+  document.getElementById('ed-date').value = dateToInput(s.date);
   document.getElementById('ed-time').value = s.time;
   document.getElementById('ed-venue').value = s.venue;
   document.getElementById('ed-fee').value = s.fee;
@@ -620,7 +635,8 @@ async function deletePlayer(id) {
 async function saveSession() {
   const s = sess(adminEditSession);
   s.title = document.getElementById('ed-title').value.trim()||s.title;
-  s.date  = document.getElementById('ed-date').value.trim()||s.date;
+  const rawDate = document.getElementById('ed-date').value;
+  if (rawDate) s.date = inputToDate(rawDate);
   s.time  = document.getElementById('ed-time').value.trim()||s.time;
   s.venue = document.getElementById('ed-venue').value.trim()||s.venue;
   s.fee   = document.getElementById('ed-fee').value.trim()||s.fee;
